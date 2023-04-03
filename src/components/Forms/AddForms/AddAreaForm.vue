@@ -47,7 +47,8 @@ export default {
                             params: {
                                 project_id: this.selectedProjectId,
                                 name: this.areaName,
-                            }
+                            },
+                            withCredentials: true
                         });
                     this.closeWindow();
                 } catch (e) {

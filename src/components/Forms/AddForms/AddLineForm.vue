@@ -38,7 +38,8 @@ export default {
                             headers: { 'content-type': 'application/javascript' },
                             params: {
                                 name: this.projectName,
-                            }
+                            },
+                            withCredentials: true
                         });
                     this.closeWindow();
                 } catch (e) {

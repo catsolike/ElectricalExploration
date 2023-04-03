@@ -8,13 +8,13 @@
                         ></my-select>
 
             <my-btn class="project_creator__add-btn"
-                        v-if="this.creatorRole"
+                        v-if="this.role === this.creatorRole"
                         @click="this.openAddProject"
                         >Добавить проект</my-btn>
 
             <my-btn class="project_creator__delete-btn"
                         v-model="selectedProjectId"
-                        v-if="this.creatorRole"
+                        v-if="this.role === this.creatorRole"
                         @click="this.openDeleteProject"
                         >Удалить проект</my-btn>
         </div>
@@ -27,12 +27,12 @@
             ></my-select>
             <my-btn class="area_creator__add-btn"
                         v-model="selectedAreaId"
-                        v-if="this.creatorRole"
+                        v-if="this.role === this.creatorRole"
                         @click="this.openAddArea"
                         >Добавить площадь</my-btn>
             <my-btn class="area_creator__delete-btn"
                         v-model="selectedAreaId"
-                        v-if="this.creatorRole"
+                        v-if="this.role === this.creatorRole"
                         @click="this.openDeleteArea"
                         >Удалить площадь</my-btn>
         </div>
@@ -45,12 +45,12 @@
             ></my-select>
             <my-btn class="line_creator__add-btn"
                     v-model="selectedLineId"
-                    v-if="this.creatorRole"
+                    v-if="this.role === this.creatorRole"
                     @click="this.openAddLine"
                     >Добавить путь</my-btn>
             <my-btn class="line_creator__delete-btn"
                     v-model="selectedLineId"
-                    v-if="this.creatorRole"
+                    v-if="this.role === this.creatorRole"
                         @click="this.openDeleteLine"
             >Удалить путь</my-btn>
         </div>
@@ -63,12 +63,12 @@
             ></my-select>
             <my-btn class="point_creator__add-btn"
                         v-model="selectedPointId"
-                        v-if="this.creatorRole"
+                        v-if="this.role === this.creatorRole"
                         @click="this.openAddPoint"
                         >Добавить точку</my-btn>
             <my-btn class="point_creator__delete-btn"
                         v-model="selectedPointId"
-                        v-if="this.creatorRole"
+                        v-if="this.role === this.creatorRole"
                         @click="this.openDeletePoint"
                         >Удалить точку</my-btn>
         </div>
@@ -193,7 +193,9 @@ export default {
             lines: [ { name: 'Сначала выберите площадь' } ],
             points: [ { name: 'Сначала выберите путь' } ],
 
-            creatorRole: true
+            creatorRole: 'creator',
+            resulterRole: 'resulter',
+            role: null,
         }
     },
     props: {
@@ -202,12 +204,13 @@ export default {
     computed: {
         infoDataGrid() {
             return {
-                'info-data_creator': this.creatorRole,
-                'info-data_resulter': !this.creatorRole
+                'info-data_creator': this.role === this.creatorRole,
+                'info-data_resulter': this.role === !this.creatorRole
             }
         },
     },
     mounted() {
+        this.checkLRole(),
         this.fetchProjects()
     },
     watch: {
@@ -225,11 +228,27 @@ export default {
         // },
     },
     methods: {
+        async checkLRole() {
+            try {
+                const response = await axios.get(`${this.serverLink}/role`,
+                    
+                    {
+                        headers: { 'content-type': 'application/javascript' },
+                        withCredentials: true
+                    })
+                this.role = response.data.role;
+            } catch (e) {
+                alert(e)
+            }
+        },
         async fetchProjects()
         {
             try {
                 const response = await axios.get(`${this.serverLink}/projects`,
-                    { headers: { 'content-type': 'application/javascript' } })
+                    {
+                        headers: { 'content-type': 'application/javascript' },
+                        withCredentials: true
+                    })
                     this.projects = response.data;
             } catch (e) {
                 alert(e)
@@ -242,7 +261,8 @@ export default {
                         headers: { 'content-type': 'application/javascript' },
                         params: {
                             project_id: projectId,
-                        }
+                        },
+                        withCredentials: true
                     })
                     this.areas = response.data;
             } catch (e) {
@@ -256,7 +276,8 @@ export default {
                         headers: { 'content-type': 'application/javascript' },
                         params: {
                             area_id: areaId,
-                        }
+                        },
+                        withCredentials: true
                     })
                     this.lines = response.data;
             } catch (e) {
@@ -270,7 +291,8 @@ export default {
                         headers: { 'content-type': 'application/javascript' },
                         params: {
                             line_id: lineId,
-                        }
+                        },
+                        withCredentials: true
                     })
                     this.points = response.data;
             } catch (e) {

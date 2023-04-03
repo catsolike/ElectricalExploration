@@ -30,7 +30,8 @@ export default {
                         headers: { 'content-type': 'application/javascript' },
                         params: {
                             id: this.elementId,
-                        }
+                        },
+                        withCredentials: true
                     });
                 this.closeWindow();
             } catch (e) {

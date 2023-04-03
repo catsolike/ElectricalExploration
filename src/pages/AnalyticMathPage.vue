@@ -19,7 +19,7 @@
         </div>
 
         <div class="status-form"
-            v-if="this.analyticRole"
+            v-if="this.role === this.analyticRole"
         >
             <p class="status-form__status-text">Статус: {{ statusData }}</p>
             <my-btn class="status-form__confirm-btn">Подтвердить</my-btn>
@@ -27,7 +27,7 @@
         </div>
 
         <div class="math-form"
-            v-if="this.mathRole"
+            v-if="this.role === this.mathRole"
         >
             <my-btn class="math-form__get-max-btn"
                     @click="openMax"
@@ -71,8 +71,8 @@ export default {
             lines: [{ name: 'Сначала выберите площадь' }],
             points: [],
 
-            analyticRole: false,
-            mathRole: true,
+            analyticRole: "analitic",
+            mathRole: "math",
 
             uncheckedStatus: 'не проверен',
             checkedStatus: 'проверен',
@@ -88,6 +88,7 @@ export default {
         MyTable
     },
     mounted() {
+        this.checkLRole(),
         this.fetchProjects()
     },
     watch: {
@@ -102,11 +103,27 @@ export default {
         },
     },
     methods: {
+        async checkLRole() {
+            try {
+                const response = await axios.get(`${this.serverLink}/role`,
+                    
+                    {
+                        headers: { 'content-type': 'application/javascript' },
+                        withCredentials: true
+                    })
+                this.role = response.data.role;
+            } catch (e) {
+                alert(e)
+            }
+        },
         async fetchProjects()
         {
             try {
                 const response = await axios.get(`${this.serverLink}/projects`,
-                    { headers: { 'content-type': 'application/javascript' } })
+                    {
+                        headers: { 'content-type': 'application/javascript' },
+                        withCredentials: true
+                    })
                     this.projects = response.data;
             } catch (e) {
                 alert(e)
@@ -119,7 +136,8 @@ export default {
                         headers: { 'content-type': 'application/javascript' },
                         params: {
                             project_id: projectId,
-                        }
+                        },
+                        withCredentials: true
                     })
                     this.areas = response.data;
             } catch (e) {
@@ -133,7 +151,8 @@ export default {
                         headers: { 'content-type': 'application/javascript' },
                         params: {
                             area_id: areaId,
-                        }
+                        },
+                        withCredentials: true
                     })
                     this.lines = response.data;
             } catch (e) {
@@ -147,7 +166,8 @@ export default {
                         headers: { 'content-type': 'application/javascript' },
                         params: {
                             line_id: lineId,
-                        }
+                        },
+                        withCredentials: true
                     })
                 this.points = response.data;
             } catch (e) {

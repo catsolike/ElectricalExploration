@@ -11,9 +11,6 @@
                         v-model:modelValue="password"
             />
 
-            <my-select  class="login-form__role-select"
-                        :placeholderText="'Роль'"
-            ></my-select>
             <my-btn class="login-form__btn"
                     @click="checkLogin"
             > {{ loginText }} </my-btn>
@@ -27,6 +24,7 @@ export default {
     name: 'login-page',
     data() {
         return {
+            serverLink: "https://shikidy.mrsmori.moe",
             placeholderRoleSelect: 'Роль',
             loginText: 'Вход',
             login: '',
@@ -34,20 +32,40 @@ export default {
         }
     },
     methods: {
-        checkLogin() {
-        //     axios.get('https://api.mrsmori.moe/login', {'headers' : {'content-type': 'application/javascript'},
+        // checkLogin() {
+        //     axios.get(`${this.serverLink}/login`, {
+        //         'headers': {
+        //             'content-type': 'application/javascript',
+        //         },
         //     'params': { login: this.login, password: this.password },
         // })
         //         .then((response) => {
         //             if (response.data.is_error === false)
         //             {
-                        this.$router.push('/')
+        //                 this.$router.push('/')
         //             }
-        //             // console.log(response.data)
         //         })
         //         .then((error) => {
         //             console.log(error)
         //         })
+        // },
+        async checkLogin() {
+            try {
+                const response = await axios.get(`${this.serverLink}/login`,
+                    
+                    {
+                        headers: { 'content-type': 'application/javascript' },
+                        params: {
+                            login: this.login,
+                            password: this.password
+                        },
+                        withCredentials: true
+                    })
+                this.role = response.data;
+                this.$router.push('/')
+            } catch (e) {
+                alert(e)
+            }
         }
     }
 }
