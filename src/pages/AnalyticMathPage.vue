@@ -35,10 +35,9 @@
             <my-btn class="math-form__get-average-a-btn">Получить среднее значение A</my-btn>
             <my-btn class="math-form__get-average-route-btn">Получить среднее значение по всему маршруту</my-btn>
             
-            <form action="graphic" target="_blank">
-                <my-btn class="math-form__open-graphic-btn"
-                >Вывести график по точке</my-btn>
-            </form>
+            <my-btn class="math-form__open-graphic-btn"
+            @click="openGraphic"
+            >Вывести график по точке</my-btn>
         </div>
 
         <div class="table-wrapper">
@@ -52,13 +51,19 @@
         >
             <p>Высшее значение: {{ getMax() }}</p>
         </my-dialog>
+
+        <my-dialog v-model:show="graphVisible"
+        >
+            <graphic-element :items="pointsToGraph"
+            ></graphic-element>
+        </my-dialog>
     </div>
 </template>
 
 <script>
 import axios from 'axios';
 import MyTable from '@/components/MyTable.vue';
-
+import GraphicElement from '@/components/GraphicElement.vue';
 export default {
     name: 'analytic-math-page',
     data() {
@@ -70,7 +75,9 @@ export default {
             areas: [ {name:'Сначала выберите проект'} ],
             lines: [{ name: 'Сначала выберите площадь' }],
             points: [],
+            pointsToGraph: [],
 
+            role: null,
             analyticRole: "analitic",
             mathRole: "math",
 
@@ -79,13 +86,15 @@ export default {
             statusData: null,
 
             dialogVisible: false,
+            graphVisible: false,
         }
     },
     props: {
         serverLink: String
     },
     components: {
-        MyTable
+        MyTable, 
+        GraphicElement
     },
     mounted() {
         this.checkLRole(),
@@ -97,6 +106,8 @@ export default {
         },
         selectedAreaId() {
             this.fetchLines(this.selectedAreaId)
+            setTimeout(this.fetchPointsByArea, 100, this.selectedAreaId);
+            
         },
         selectedLineId() {
             this.fetchPoints(this.selectedLineId)
@@ -108,7 +119,6 @@ export default {
                 const response = await axios.get(`${this.serverLink}/role`,
                     
                     {
-                        headers: { 'content-type': 'application/javascript' },
                         withCredentials: true
                     })
                 this.role = response.data.role;
@@ -121,7 +131,6 @@ export default {
             try {
                 const response = await axios.get(`${this.serverLink}/projects`,
                     {
-                        headers: { 'content-type': 'application/javascript' },
                         withCredentials: true
                     })
                     this.projects = response.data;
@@ -133,7 +142,6 @@ export default {
             try {
                 const response = await axios.get(`${this.serverLink}/areas`,
                     {
-                        headers: { 'content-type': 'application/javascript' },
                         params: {
                             project_id: projectId,
                         },
@@ -148,7 +156,6 @@ export default {
             try {
                 const response = await axios.get(`${this.serverLink}/lines`,
                     {
-                        headers: { 'content-type': 'application/javascript' },
                         params: {
                             area_id: areaId,
                         },
@@ -163,7 +170,6 @@ export default {
             try {
                 const response = await axios.get(`${this.serverLink}/points`,
                     {
-                        headers: { 'content-type': 'application/javascript' },
                         params: {
                             line_id: lineId,
                         },
@@ -174,6 +180,20 @@ export default {
                 console.log(e)
             }
         },
+        async fetchPointsByArea(id) {
+            try {
+                const response = await axios.get(`${this.serverLink}/points_by_area`,
+                {
+                    params: {
+                        area_id: id,
+                    },
+                    withCredentials: true
+                })
+                this.pointsToGraph = response.data;
+            } catch (e) {
+                console.log(e)
+            }
+        },  
         openMax() {
             this.dialogVisible = true;
         },
@@ -188,6 +208,11 @@ export default {
         getAverageLine() {
             
         },
+        openGraphic() {
+            if(this.selectedAreaId != null)
+                this.graphVisible = true;
+            else alert("Выберите площадь")
+        }
     }
 }
 </script>

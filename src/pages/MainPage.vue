@@ -9,8 +9,15 @@
                             :serverLink="serverLink"
     ></creator-resulter-page>
 
-    <div v-else class="unlogin"
-    >Войдите, чтобы использовать сайт</div>
+    <div v-else class="unlogin">
+        <div  
+        >Войдите, чтобы использовать сайт</div>
+        <my-btn 
+                @click="redirectToLogin"
+        >
+            Войти
+        </my-btn>
+    </div>
 </template>
 
 <script>
@@ -47,8 +54,11 @@ export default {
                     })
                 this.role = response.data.role;
             } catch (e) {
-                alert(e)
+                this.redirectToLogin()
             }
+        },
+        redirectToLogin() {
+            this.$router.push('/login')
         }
     }
 }

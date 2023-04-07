@@ -32,23 +32,6 @@ export default {
         }
     },
     methods: {
-        // checkLogin() {
-        //     axios.get(`${this.serverLink}/login`, {
-        //         'headers': {
-        //             'content-type': 'application/javascript',
-        //         },
-        //     'params': { login: this.login, password: this.password },
-        // })
-        //         .then((response) => {
-        //             if (response.data.is_error === false)
-        //             {
-        //                 this.$router.push('/')
-        //             }
-        //         })
-        //         .then((error) => {
-        //             console.log(error)
-        //         })
-        // },
         async checkLogin() {
             try {
                 const response = await axios.get(`${this.serverLink}/login`,
